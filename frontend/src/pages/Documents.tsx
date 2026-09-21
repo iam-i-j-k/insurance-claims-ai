@@ -1,6 +1,6 @@
 import { FileText, Download, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 
 export default function Documents() {
@@ -8,7 +8,7 @@ export default function Documents() {
   const { data: claims, isLoading } = useQuery({
     queryKey: ['claims'],
     queryFn: async () => {
-      const { data } = await axios.get('http://localhost:8000/api/claims');
+      const { data } = await api.get('/claims');
       return data;
     },
     refetchInterval: 10000

@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '../api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { BarChart3, TrendingUp, DollarSign, Activity } from 'lucide-react';
 
 const fetchAnalytics = async () => {
-  const { data } = await axios.get('http://localhost:8000/api/analytics');
+  const { data } = await api.get('/analytics');
   return data;
 };
 

@@ -1,6 +1,6 @@
 import { useParams, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '../api';
 import { Shield, FileText, AlertTriangle, GitMerge, ChevronLeft, Mail } from 'lucide-react';
 import WorkflowStatus from '../components/WorkflowStatus';
 import CoverageMatrix from '../components/CoverageMatrix';
@@ -9,7 +9,7 @@ import TriageReport from '../components/TriageReport';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const fetchClaim = async (id: string) => {
-  const { data } = await axios.get(`http://localhost:8000/api/claims/${id}`);
+  const { data } = await api.get(`/claims/${id}`);
   return data;
 };
 

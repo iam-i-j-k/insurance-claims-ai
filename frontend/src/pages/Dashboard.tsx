@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, Bell, Plus, Calendar, Filter, Download, FileText, Bot, 
@@ -16,12 +16,12 @@ import toast from 'react-hot-toast';
 import ArchitectureModal from '../components/ArchitectureModal';
 
 const fetchClaims = async () => {
-  const { data } = await axios.get('http://localhost:8000/api/claims');
+  const { data } = await api.get('/claims');
   return data;
 };
 
 const fetchAnalytics = async () => {
-  const { data } = await axios.get('http://localhost:8000/api/analytics');
+  const { data } = await api.get('/analytics');
   return data;
 };
 

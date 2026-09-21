@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 import { UploadCloud, CheckCircle, File as FileIcon, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,18 +42,18 @@ export default function NewClaim() {
     setIsCreating(true);
     try {
       // 1. Create claim
-      const { data: claimData } = await axios.post('http://localhost:8000/api/claims');
+      const { data: claimData } = await api.post('/claims');
       const claimId = claimData.claim_id;
       
       // 2. Upload documents
       for (const file of files) {
         const formData = new FormData();
         formData.append('file', file);
-        await axios.post(`http://localhost:8000/api/claims/${claimId}/documents`, formData);
+        await api.post(`/claims/${claimId}/documents`, formData);
       }
       
       // 3. Start processing
-      await axios.post(`http://localhost:8000/api/claims/${claimId}/process`);
+      await api.post(`/claims/${claimId}/process`);
       
       toast.success('Claim created successfully!');
       navigate(`/claims/${claimId}`);
