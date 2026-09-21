@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { motion, Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { BarChart3, TrendingUp, DollarSign, Activity } from 'lucide-react';
 
 const fetchAnalytics = async () => {
@@ -99,7 +100,7 @@ export default function Analytics() {
                 <BarChart data={stats.type_amounts}>
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontFamily: 'monospace', fontSize: 12 }} />
                   <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `$${val/1000}k`} tick={{ fill: '#64748b', fontFamily: 'monospace', fontSize: 12 }} />
-                  <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(val) => [`$${val.toLocaleString()}`, 'Amount']} />
+                  <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(val: any) => [`$${(val || 0).toLocaleString()}`, 'Amount']} />
                   <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

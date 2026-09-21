@@ -4,12 +4,12 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, Bell, Plus, Calendar, Filter, Download, FileText, Bot, 
-  Hand, ShieldAlert, Clock, Activity, ChevronRight, CheckCircle, 
-  AlertTriangle, ArrowRight, ExternalLink
+  Hand, ShieldAlert, Clock, Activity, ChevronRight, 
+  ArrowRight, ExternalLink
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
-  ResponsiveContainer, PieChart, Pie, Cell, Legend 
+  ResponsiveContainer, PieChart, Pie, Cell 
 } from 'recharts';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -363,7 +363,7 @@ export default function Dashboard() {
                   dataKey="value"
                   stroke="none"
                 >
-                  {riskData.map((entry: any, index: number) => (
+                  {riskData.map((_entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>

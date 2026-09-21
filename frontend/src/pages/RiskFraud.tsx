@@ -1,4 +1,4 @@
-import { ShieldAlert, AlertTriangle, Search, Filter } from 'lucide-react';
+import { ShieldAlert, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';

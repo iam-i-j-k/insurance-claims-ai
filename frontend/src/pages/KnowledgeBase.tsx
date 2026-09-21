@@ -1,4 +1,4 @@
-import { BookOpen, Search, FileText } from 'lucide-react';
+import { BookOpen, Search } from 'lucide-react';
 
 export default function KnowledgeBase() {
   const policies = [

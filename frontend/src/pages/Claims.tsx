@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, Bell, Plus, Calendar, Filter, Download, FileText,
-  Activity, ChevronRight, CheckCircle
+  Activity, ChevronRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
