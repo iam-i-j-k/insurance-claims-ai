@@ -20,3 +20,4 @@ bcrypt
 requests
 langchain-groq
 passlib
+email-validator
