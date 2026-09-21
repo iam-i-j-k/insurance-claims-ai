@@ -7,7 +7,7 @@ import bcrypt
 import os
 import requests
 import uuid
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 SECRET_KEY = os.getenv("JWT_SECRET", "super-secret-key-123")
 ALGORITHM = "HS256"
@@ -66,6 +66,29 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user["email"], "id": user["id"], "name": user["name"]}
     )
     return {"access_token": access_token, "token_type": "bearer", "user": {"id": user["id"], "email": user["email"], "name": user["name"]}}
+
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    password: str
+    name: str
+
+@router.post("/register")
+async def register_user(request: RegisterRequest):
+    if get_user_by_email(request.email):
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered"
+        )
+    
+    user_id = str(uuid.uuid4())
+    hashed_password = bcrypt.hashpw(request.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    create_user(user_id, request.email, hashed_password, request.name)
+    
+    # Return access token immediately upon registration
+    access_token = create_access_token(
+        data={"sub": request.email, "id": user_id, "name": request.name}
+    )
+    return {"access_token": access_token, "token_type": "bearer", "user": {"id": user_id, "email": request.email, "name": request.name}}
 
 class GoogleAuthRequest(BaseModel):
     access_token: str

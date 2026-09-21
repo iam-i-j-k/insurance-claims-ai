@@ -19,10 +19,10 @@ export default function TriageReport({ claim }: { claim: any }) {
     return <div className="text-slate-500 py-8 text-center border border-dashed border-slate-300 bg-slate-50 rounded-none font-mono text-sm">Triage report not yet available.</div>;
   }
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittingAction, setSubmittingAction] = useState<string | null>(null);
 
   const handleAdjusterDecision = async (action: string) => {
-    setIsSubmitting(true);
+    setSubmittingAction(action);
     try {
       await api.post(`/claims/${claim.claim_id}/review`, {
         action,
@@ -35,7 +35,7 @@ export default function TriageReport({ claim }: { claim: any }) {
     } catch (error) {
       toast.error('Failed to record decision.');
     } finally {
-      setIsSubmitting(false);
+      setSubmittingAction(null);
     }
   };
 
@@ -119,20 +119,20 @@ export default function TriageReport({ claim }: { claim: any }) {
         <p className="text-slate-400 text-sm mb-6 font-mono">Review the AI's findings and make a final determination for this workflow phase.</p>
         
         <div className="flex flex-wrap gap-4">
-          <button disabled={isSubmitting} onClick={() => handleAdjusterDecision('APPROVE')} className="flex items-center gap-2 bg-white text-slate-900 hover:bg-slate-200 px-6 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest transition-colors disabled:opacity-50">
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />} Approve
+          <button disabled={submittingAction !== null} onClick={() => handleAdjusterDecision('APPROVE')} className="flex items-center gap-2 bg-white text-slate-900 hover:bg-slate-200 px-6 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest transition-colors disabled:opacity-50">
+            {submittingAction === 'APPROVE' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />} Approve
           </button>
           
-          <button disabled={isSubmitting} onClick={() => handleAdjusterDecision('REQUEST_DOCUMENTS')} className="flex items-center gap-2 border border-slate-600 hover:border-slate-400 text-slate-200 px-6 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest transition-colors disabled:opacity-50">
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />} Request Docs
+          <button disabled={submittingAction !== null} onClick={() => handleAdjusterDecision('REQUEST_DOCUMENTS')} className="flex items-center gap-2 border border-slate-600 hover:border-slate-400 text-slate-200 px-6 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest transition-colors disabled:opacity-50">
+            {submittingAction === 'REQUEST_DOCUMENTS' ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />} Request Docs
           </button>
           
-          <button disabled={isSubmitting} onClick={() => handleAdjusterDecision('ESCALATE')} className="flex items-center gap-2 border border-slate-600 hover:border-slate-400 text-slate-200 px-6 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest transition-colors disabled:opacity-50">
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />} Escalate
+          <button disabled={submittingAction !== null} onClick={() => handleAdjusterDecision('ESCALATE')} className="flex items-center gap-2 border border-slate-600 hover:border-slate-400 text-slate-200 px-6 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest transition-colors disabled:opacity-50">
+            {submittingAction === 'ESCALATE' ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />} Escalate
           </button>
           
-          <button disabled={isSubmitting} onClick={() => handleAdjusterDecision('REJECT')} className="flex items-center gap-2 bg-transparent border border-rose-900 text-rose-500 hover:bg-rose-950 px-6 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest transition-colors ml-auto disabled:opacity-50">
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />} Reject
+          <button disabled={submittingAction !== null} onClick={() => handleAdjusterDecision('REJECT')} className="flex items-center gap-2 bg-transparent border border-rose-900 text-rose-500 hover:bg-rose-950 px-6 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest transition-colors ml-auto disabled:opacity-50">
+            {submittingAction === 'REJECT' ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />} Reject
           </button>
         </div>
       </div>

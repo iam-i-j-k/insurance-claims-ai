@@ -26,6 +26,7 @@ export default function Claims() {
   const [currentPage, setCurrentPage] = useState(1);
   const [timeFilter, setTimeFilter] = useState('Oct 18 - Oct 24');
   const [lineFilter, setLineFilter] = useState('All Lines');
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const itemsPerPage = 10;
 
   const { data: claims, isLoading: claimsLoading } = useQuery({
@@ -86,7 +87,9 @@ export default function Claims() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `claims_export_${new Date().getTime()}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
     toast.success("Export downloaded successfully");
   };
@@ -139,14 +142,53 @@ export default function Claims() {
               placeholder="Search claims, policies, or claimants..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-12 py-2 bg-white border border-slate-200 rounded-xl text-sm w-80 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+              className="pl-9 pr-12 py-2 bg-white border border-slate-200 rounded-xl text-sm w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
             />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 bg-slate-100 text-slate-400 rounded text-[10px] font-mono font-bold border border-slate-200">⌘K</div>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 bg-slate-100 text-slate-400 rounded text-[10px] font-mono font-bold border border-slate-200 hidden sm:block">⌘K</div>
           </div>
-          <button className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#f8fafc]"></span>
-          </button>
+          
+          <div className="relative">
+            <button 
+              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors relative"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#f8fafc]"></span>
+            </button>
+            
+            {isNotificationsOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setIsNotificationsOpen(false)}></div>
+                <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden transform origin-top-right transition-all">
+                  <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <span className="font-bold text-slate-800 text-sm">Notifications</span>
+                    <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">2 New</span>
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto">
+                    <div className="p-3 border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors flex gap-3">
+                      <div className="mt-1 w-2 h-2 rounded-full bg-rose-500 flex-shrink-0"></div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">High Risk Fraud Flag Detected</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Claim CLM-2026-9A82B exhibits matching EXIF metadata with a known syndicate.</p>
+                        <p className="text-[9px] text-slate-400 font-medium mt-1">2 mins ago</p>
+                      </div>
+                    </div>
+                    <div className="p-3 border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors flex gap-3">
+                      <div className="mt-1 w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">Claim Auto-Settled</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Claim CLM-2026-3C4D5 processed via Fast Track. Policyholder notified.</p>
+                        <p className="text-[9px] text-slate-400 font-medium mt-1">15 mins ago</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-2 text-center bg-slate-50 border-t border-slate-100">
+                    <button className="text-xs font-bold text-blue-600 hover:text-blue-700">Mark all as read</button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
           <Link to="/claims/new" className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-sm hover:bg-slate-800 transition-all active:scale-95">
             <Plus className="w-4 h-4" /> New Claim
           </Link>
@@ -189,7 +231,7 @@ export default function Claims() {
             <span className="px-2 py-0.5 bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-wider rounded border border-amber-100">{analytics?.urgent_count || 0} Review Needed</span>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setHitlReady(!hitlReady)} className={`px-3 py-1.5 border ${hitlReady ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600'} text-xs font-semibold rounded-lg hover:bg-slate-800 hover:text-white transition-colors`}>Filter: Review Needed</button>
+            <button onClick={() => setHitlReady(!hitlReady)} className={`hidden sm:block px-3 py-1.5 border ${hitlReady ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600'} text-xs font-semibold rounded-lg hover:bg-slate-800 hover:text-white transition-colors`}>Filter: Review Needed</button>
             <button onClick={handleBulkRescore} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-50 transition-colors">Bulk Re-score</button>
           </div>
         </div>

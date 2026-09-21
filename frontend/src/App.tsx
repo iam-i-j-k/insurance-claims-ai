@@ -6,8 +6,9 @@ import NewClaim from './pages/NewClaim';
 import ClaimDetail from './pages/ClaimDetail';
 import Analytics from './pages/Analytics';
 import Login from './pages/Login';
+import { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { LayoutDashboard, FileText, FolderOpen, BookOpen, ShieldAlert, BarChart3, History, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, FolderOpen, BookOpen, ShieldAlert, BarChart3, History, LogOut, Menu, X } from 'lucide-react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from 'react-hot-toast';
 
@@ -20,7 +21,12 @@ import api from './api';
 
 const queryClient = new QueryClient();
 
-function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: (val: boolean) => void;
+}
+
+function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const location = useLocation();
   const { user, logout } = useAuth();
   const path = location.pathname;
@@ -39,39 +45,50 @@ function Sidebar() {
   const inactiveClass = "text-slate-600 hover:bg-slate-50 hover:text-slate-900";
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col h-screen sticky top-0">
-      <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <ShieldAlert className="w-6 h-6 text-blue-600" />
-          <span className="font-bold tracking-tight text-slate-900">ClaimGuard AI</span>
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      
+      <aside className={`fixed md:sticky top-0 left-0 h-screen w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-6 h-6 text-blue-600" />
+            <span className="font-bold tracking-tight text-slate-900">ClaimGuard AI</span>
+          </div>
+          <button className="md:hidden text-slate-500 hover:bg-slate-100 p-1 rounded-md" onClick={() => setIsOpen(false)}>
+            <X className="w-5 h-5" />
+          </button>
         </div>
-        <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v2.4</span>
-      </div>
       
       <div className="px-4 py-6">
         <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-3">Triage Workspace</div>
         <nav className="space-y-1">
-          <Link to="/dashboard" className={`${baseClass} ${path === '/dashboard' ? activeClass : inactiveClass}`}>
+          <Link to="/dashboard" onClick={() => setIsOpen(false)} className={`${baseClass} ${path === '/dashboard' ? activeClass : inactiveClass}`}>
             <LayoutDashboard className="w-4 h-4" /> Dashboard
           </Link>
-          <Link to="/claims" className={`${baseClass} justify-between ${path.startsWith('/claims') ? activeClass : inactiveClass}`}>
+          <Link to="/claims" onClick={() => setIsOpen(false)} className={`${baseClass} justify-between ${path.startsWith('/claims') ? activeClass : inactiveClass}`}>
             <div className="flex items-center gap-3"><FolderOpen className="w-4 h-4" /> Claims</div>
             <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${path.startsWith('/claims') ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-600'}`}>{analytics?.total || 0}</span>
           </Link>
-          <Link to="/documents" className={`${baseClass} ${path.startsWith('/documents') ? activeClass : inactiveClass}`}>
+          <Link to="/documents" onClick={() => setIsOpen(false)} className={`${baseClass} ${path.startsWith('/documents') ? activeClass : inactiveClass}`}>
             <FileText className="w-4 h-4" /> Documents
           </Link>
-          <Link to="/knowledge" className={`${baseClass} ${path.startsWith('/knowledge') ? activeClass : inactiveClass}`}>
+          <Link to="/knowledge" onClick={() => setIsOpen(false)} className={`${baseClass} ${path.startsWith('/knowledge') ? activeClass : inactiveClass}`}>
             <BookOpen className="w-4 h-4" /> Policy Knowledge Base
           </Link>
-          <Link to="/risk" className={`${baseClass} justify-between ${path.startsWith('/risk') ? activeClass : inactiveClass}`}>
+          <Link to="/risk" onClick={() => setIsOpen(false)} className={`${baseClass} justify-between ${path.startsWith('/risk') ? activeClass : inactiveClass}`}>
             <div className="flex items-center gap-3"><ShieldAlert className="w-4 h-4" /> Risk & Fraud</div>
             <span className="text-xs bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full font-mono border border-rose-100">{analytics?.siu_active_count || 0}</span>
           </Link>
-          <Link to="/analytics" className={`${baseClass} ${path.startsWith('/analytics') ? activeClass : inactiveClass}`}>
+          <Link to="/analytics" onClick={() => setIsOpen(false)} className={`${baseClass} ${path.startsWith('/analytics') ? activeClass : inactiveClass}`}>
             <BarChart3 className="w-4 h-4" /> Reports
           </Link>
-          <Link to="/audit" className={`${baseClass} ${path.startsWith('/audit') ? activeClass : inactiveClass}`}>
+          <Link to="/audit" onClick={() => setIsOpen(false)} className={`${baseClass} ${path.startsWith('/audit') ? activeClass : inactiveClass}`}>
             <History className="w-4 h-4" /> Audit Log
           </Link>
         </nav>
@@ -94,11 +111,13 @@ function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }
 
 function ProtectedLayout() {
   const { user, isLoading } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -113,10 +132,25 @@ function ProtectedLayout() {
   }
 
   return (
-    <div className="min-h-screen text-slate-900 font-sans bg-[#f8fafc] flex selection:bg-blue-100">
-      <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col overflow-y-auto">
-        <div className="w-full max-w-[1600px] mx-auto p-6 md:p-8">
+    <div className="min-h-screen text-slate-900 font-sans bg-[#f8fafc] flex flex-col md:flex-row selection:bg-blue-100 relative">
+      <Sidebar isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
+      
+      <main className="flex-1 min-w-0 flex flex-col h-screen overflow-y-auto w-full">
+        {/* Mobile Header */}
+        <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-6 h-6 text-blue-600" />
+            <span className="font-bold tracking-tight text-slate-900">ClaimGuard AI</span>
+          </div>
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="p-2 -mr-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="w-full max-w-[1600px] mx-auto p-4 sm:p-6 md:p-8 flex-1">
           <Toaster position="top-right" toastOptions={{ style: { borderRadius: '8px', background: '#334155', color: '#fff', fontSize: '14px', fontWeight: 600 } }} />
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

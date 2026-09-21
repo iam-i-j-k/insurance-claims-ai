@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldAlert, LogIn, Lock, Mail } from 'lucide-react';
+import { ShieldAlert, LogIn, Lock, Mail, UserPlus, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../api';
 import { useGoogleLogin } from '@react-oauth/google';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -19,18 +21,27 @@ export default function Login() {
     setError('');
 
     try {
-      const formData = new URLSearchParams();
-      formData.append('username', email);
-      formData.append('password', password);
-
-      const { data } = await axios.post('/auth/token', formData, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      });
+      let responseData;
       
-      login(data.access_token, data.user);
+      if (isLoginMode) {
+        const formData = new URLSearchParams();
+        formData.append('username', email);
+        formData.append('password', password);
+        const { data } = await api.post('/auth/token', formData, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+        responseData = data;
+      } else {
+        const { data } = await api.post('/auth/register', {
+          email, password, name
+        });
+        responseData = data;
+      }
+      
+      login(responseData.access_token, responseData.user);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
+      setError(err.response?.data?.detail || (isLoginMode ? 'Login failed.' : 'Registration failed.'));
     } finally {
       setIsLoading(false);
     }
@@ -40,7 +51,7 @@ export default function Login() {
     setIsLoading(true);
     setError('');
     try {
-      const { data } = await axios.post('/auth/google', { access_token: tokenResponse.access_token });
+      const { data } = await api.post('/auth/google', { access_token: tokenResponse.access_token });
       login(data.access_token, data.user);
       navigate('/dashboard');
     } catch (err: any) {
@@ -63,7 +74,7 @@ export default function Login() {
           <span className="text-3xl font-bold tracking-tight text-slate-900">ClaimGuard AI</span>
         </div>
         <h2 className="mt-2 text-center text-xl font-medium text-slate-600 tracking-wide">
-          Sign in to your adjuster workspace
+          {isLoginMode ? 'Sign in to your adjuster workspace' : 'Create your adjuster account'}
         </h2>
       </div>
 
@@ -73,6 +84,25 @@ export default function Login() {
             {error && (
               <div className="bg-rose-50 border border-rose-200 text-rose-600 text-sm px-4 py-3 rounded-xl flex items-start gap-2">
                 <span className="font-bold">Error:</span> {error}
+              </div>
+            )}
+
+            {!isLoginMode && (
+              <div>
+                <label className="block text-sm font-semibold text-slate-700">Full Name</label>
+                <div className="mt-2 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <input
+                    type="text"
+                    required={!isLoginMode}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-shadow"
+                    placeholder="Dwight Schrute"
+                  />
+                </div>
               </div>
             )}
             
@@ -130,7 +160,8 @@ export default function Login() {
                   <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                 ) : (
                   <>
-                    <LogIn className="w-5 h-5" /> Sign in
+                    {isLoginMode ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />} 
+                    {isLoginMode ? 'Sign in' : 'Create account'}
                   </>
                 )}
               </button>
@@ -162,6 +193,18 @@ export default function Login() {
               </button>
             </div>
           </form>
+          
+          <div className="mt-8 text-center text-sm">
+            <span className="text-slate-500">
+              {isLoginMode ? "Don't have an account?" : "Already have an account?"}
+            </span>{' '}
+            <button
+              onClick={() => setIsLoginMode(!isLoginMode)}
+              className="font-bold text-blue-600 hover:text-blue-500 hover:underline transition-all"
+            >
+              {isLoginMode ? "Sign up" : "Sign in"}
+            </button>
+          </div>
           
           <div className="mt-6 text-center text-xs text-slate-500">
             Internal ClaimGuard AI System v2.4 <br/> Unauthorized access is prohibited.

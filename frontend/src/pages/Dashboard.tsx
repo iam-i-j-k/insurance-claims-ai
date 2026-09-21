@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [timeFilter, setTimeFilter] = useState('Oct 18 - Oct 24');
   const [lineFilter, setLineFilter] = useState('All Lines');
   const [isArchModalOpen, setIsArchModalOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const itemsPerPage = 5;
 
   const { data: claims, isLoading: claimsLoading } = useQuery({
@@ -93,7 +94,9 @@ export default function Dashboard() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `claims_export_${new Date().getTime()}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
     toast.success("Export downloaded successfully");
   };
@@ -161,20 +164,60 @@ export default function Dashboard() {
               placeholder="Search claims, policies, or claimants..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-12 py-2 bg-white border border-slate-200 rounded-xl text-sm w-80 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+              className="pl-9 pr-12 py-2 bg-white border border-slate-200 rounded-xl text-sm w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
             />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 bg-slate-100 text-slate-400 rounded text-[10px] font-mono font-bold border border-slate-200">⌘K</div>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 bg-slate-100 text-slate-400 rounded text-[10px] font-mono font-bold border border-slate-200 hidden sm:block">⌘K</div>
           </div>
           <button 
             onClick={() => setHitlReady(!hitlReady)}
-            className={`flex items-center gap-2 px-3 py-2 border rounded-xl text-sm font-semibold transition-colors shadow-sm ${hitlReady ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+            className={`hidden sm:flex items-center gap-2 px-3 py-2 border rounded-xl text-sm font-semibold transition-colors shadow-sm ${hitlReady ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
           >
             <div className={`w-2 h-2 rounded-full ${hitlReady ? 'bg-amber-500' : 'bg-slate-300'}`}></div> HITL Ready
           </button>
-          <button className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#f8fafc]"></span>
-          </button>
+          
+          <div className="relative">
+            <button 
+              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors relative"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#f8fafc]"></span>
+            </button>
+            
+            {isNotificationsOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setIsNotificationsOpen(false)}></div>
+                <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden transform origin-top-right transition-all">
+                  <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <span className="font-bold text-slate-800 text-sm">Notifications</span>
+                    <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">2 New</span>
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto">
+                    <div className="p-3 border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors flex gap-3">
+                      <div className="mt-1 w-2 h-2 rounded-full bg-rose-500 flex-shrink-0"></div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">High Risk Fraud Flag Detected</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Claim CLM-2026-9A82B exhibits matching EXIF metadata with a known syndicate.</p>
+                        <p className="text-[9px] text-slate-400 font-medium mt-1">2 mins ago</p>
+                      </div>
+                    </div>
+                    <div className="p-3 border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors flex gap-3">
+                      <div className="mt-1 w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">Claim Auto-Settled</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Claim CLM-2026-3C4D5 processed via Fast Track. Policyholder notified.</p>
+                        <p className="text-[9px] text-slate-400 font-medium mt-1">15 mins ago</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-2 text-center bg-slate-50 border-t border-slate-100">
+                    <button className="text-xs font-bold text-blue-600 hover:text-blue-700">Mark all as read</button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+          
           <Link to="/claims/new" className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-sm hover:bg-slate-800 transition-all active:scale-95">
             <Plus className="w-4 h-4" /> New Claim
           </Link>
@@ -210,7 +253,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="tech-panel p-5 relative overflow-hidden group">
           <div className="flex justify-between items-start mb-4">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Claims</span>
@@ -527,7 +570,7 @@ export default function Dashboard() {
           </div>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <div className="border border-slate-200 rounded-xl p-4 flex flex-col hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer bg-white">
             <div className="flex justify-between items-start mb-2 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">
               <span>Agent 01</span>

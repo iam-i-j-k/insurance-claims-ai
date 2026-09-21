@@ -1,37 +1,42 @@
-# ClaimGuard AI: Agentic Insurance Claims Triage System
+# ClaimGuard AI 🛡️
+**Autonomous Insurance Claims Orchestration & Adjudication System**
 
-An advanced Agentic AI decision-support platform designed to automate the triage and preliminary assessment of insurance claims using LangGraph and FastAPI. 
+ClaimGuard AI is a cutting-edge Agentic AI platform built with **LangGraph** and **FastAPI** on the backend, and **React + Vite** on the frontend. It orchestrates a multi-agent workflow to automate the intake, classification, coverage verification, fraud detection, and settlement calculations for insurance claims. 
 
-**IMPORTANT**: This system is designed as a *decision-support* tool. It will NEVER automatically approve or reject a claim. It generates a comprehensive triage report and routes the case to a human adjuster for final approval.
+Designed strictly as a *Human-in-the-Loop* (HITL) decision-support system, it handles the heavy lifting of document analysis and triage, while routing the final AI-generated report and email drafts to a human adjuster for final authorization.
 
-## 🚀 Features
-- **Multi-Agent Architecture**: Built with LangGraph. Includes Intake, Classification, Coverage, Fraud, Settlement, Reviewer, and Report agents.
-- **RAG-Powered Coverage Matrix**: Uses ChromaDB and LangChain to fetch semantic matches from the policy knowledge base.
-- **Hybrid AI + Deterministic Rules**: Combines LLM risk assessment with deterministic hardcoded constraints (e.g. math checks, claim history).
-- **Self-Correction (Reflection)**: The Reviewer Agent audits intermediate outputs and can trigger a re-processing loop if hallucination or incomplete data is detected.
-- **Human-in-the-Loop Workflow**: Live dashboard for adjusters to review the final Triage Report, Risk Panel, Coverage Matrix, and issue the final ruling.
-- **Multi-Modal Document Intake**: Processes `.pdf`, `.docx`, and `.jpg` utilizing PyMuPDF, python-docx, and Tesseract OCR.
+## ✨ Key Features
+- **Multi-Agent LangGraph Workflow**: A network of highly specialized AI agents (Intake, Classification, Coverage, Fraud, Settlement, Review/Critique, and Communication) working asynchronously to process claims.
+- **Google SSO & JWT Authentication**: Secure, session-based authentication using Google OAuth 2.0, Passlib, and bcrypt password hashing.
+- **RAG-Powered Policy Engine**: Integrates **Pinecone** Vector DB and LangChain to semantically match claim conditions against a vast knowledge base of policy documents.
+- **Aesthetic Glassmorphic UI**: Built with React, TailwindCSS, and Framer Motion for a premium, minimalistic, and highly responsive user experience. Includes an interactive Agentic Architecture Graph, metric visualizations, and hot toast notifications.
+- **Automated Email Drafting**: The Communication Agent automatically drafts highly contextual emails (Approval, Rejection, Request for Information) based on the claim's final adjudicated state.
+- **Multi-Modal OCR Intake**: Seamlessly processes `.pdf`, `.docx`, and `.jpg` submissions using PyMuPDF, `python-docx`, and Tesseract OCR.
 
-## 🏗️ Architecture
+## 🏗️ Architecture Stack
+- **Frontend**: React 18, Vite, TailwindCSS, Framer Motion, React Query, Lucide React, Recharts.
+- **Backend**: FastAPI, LangGraph, LangChain, SQLite (State Persistence Engine), Pinecone, Passlib/Bcrypt.
+- **LLM Engine**: Groq (Llama-3/Mixtral models for hyper-fast, low-latency reasoning).
 
-1. **Frontend**: React, Vite, TailwindCSS, React Query.
-2. **Backend**: FastAPI, LangGraph, LangChain, SQLite (MVP Persistence).
-3. **LLM**: Google Gemini (Configurable via `GOOGLE_API_KEY`).
-4. **Vector Store**: ChromaDB.
-
-## ⚙️ Quick Start Setup
+## ⚙️ Local Development Setup
 
 ### 1. Backend Setup
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # (or venv\Scripts\activate on Windows)
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-
-# Set your Google Gemini API Key
-export GOOGLE_API_KEY="your-api-key-here"
-
-# Start the FastAPI Server
+```
+**Environment Variables (`backend/.env`)**:
+```env
+GROQ_API_KEY=your_groq_api_key
+PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_INDEX_NAME=policy-knowledge-base
+JWT_SECRET=your_jwt_secret_key
+DATABASE_URL=sqlite:///./claims.db
+```
+Start the local server:
+```bash
 uvicorn app.main:app --reload
 ```
 
@@ -41,17 +46,20 @@ cd frontend
 npm install
 npm run dev
 ```
+**Configuration**:
+Ensure you have configured a valid Google Client ID in your `App.tsx` `<GoogleOAuthProvider>`. The application will automatically communicate with the local backend via `api.ts`.
 
-### 3. Demo Data Generation
-If you want to test the workflow with dummy data, we provided a python script to generate a `.docx` policy and a `.docx` claim form.
-```bash
-cd sample_claims
-python generate_demo_data.py
-```
-This generates `demo_claim_form.docx` in the `sample_claims` directory and `motor_policy.docx` in `knowledge_base/motor`.
+## 🌐 Production Deployment Options
+- **Backend (Render)**: Ready for deployment on Render as a Web Service. Set your Start Command to `uvicorn app.main:app --host 0.0.0.0 --port $PORT` and configure your environment variables in the Render Dashboard.
+- **Frontend (Vercel)**: Optimized for Vercel deployment. Includes a `vercel.json` for SPA routing rules to prevent 404s on page refreshes. Build command: `npm run build`.
 
-## 🧪 How it Works
-1. Upload the `demo_claim_form.docx` on the New Claim page.
-2. The LangGraph workflow automatically initiates in the background.
-3. The UI queries the FastAPI backend to visualize real-time agent progression (Intake -> Classification -> Coverage -> Fraud -> Settlement -> Reviewer -> Report).
-4. Review the final AI Triage Report and click "Approve", "Reject", or "Escalate".
+## 🧪 How it Works (The Workflow)
+1. **Intake**: An adjuster logs into the portal using Google SSO and uploads a claim document on the "New Claim" page.
+2. **Execution**: The LangGraph state machine triggers on the backend. You can trace the live execution via the dashboard's "Live Adjudication Stream".
+3. **Multi-Agent Processing**: 
+   - *Intake Agent* extracts structured JSON data (policyholder, incident details).
+   - *Classification Agent* maps the claim taxonomy.
+   - *Coverage Agent* queries Pinecone RAG for policy limits and exclusions.
+   - *Fraud Agent* assesses risk scoring based on behavioral anomalies.
+   - *Communication Agent* drafts a personalized response.
+4. **Human Review**: The Adjuster opens the Claim Detail view, inspects the AI's logic, reviews the drafted email, and clicks "Approve", "Reject", or "Escalate".
