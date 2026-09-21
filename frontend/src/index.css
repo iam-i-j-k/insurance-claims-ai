@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 0 0% 9%; /* Deep black */
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    
+    --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+body {
+  font-family: var(--sans);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Base custom classes for the new technical aesthetic */
+.tech-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  border-radius: 1rem;
+}
+
+.tech-panel-dark {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  color: #f8fafc;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2);
+  border-radius: 1rem;
+}

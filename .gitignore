@@ -1,0 +1,19 @@
+backend/.env
+backend/client_secret_*.json
+backend/*.pem
+
+# Local runtime data
+backend/chroma_db/
+backend/uploads/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environment and editor files
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
