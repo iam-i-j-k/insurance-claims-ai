@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { BarChart3, TrendingUp, DollarSign, Activity } from 'lucide-react';
 
 const fetchAnalytics = async () => {
@@ -30,11 +30,11 @@ export default function Analytics() {
     { name: 'Pending/Review', value: stats.pending, color: '#f59e0b' },
   ].filter(d => d.value > 0);
 
-  const container = {
+  const container: Variants = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
-  const item = {
+  const item: Variants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
