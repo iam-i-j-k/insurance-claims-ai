@@ -13,5 +13,8 @@ pytesseract
 Pillow
 sqlalchemy
 python-dotenv
+PyJWT
 pytest
 python-multipart
+bcrypt
+requests
