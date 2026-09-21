@@ -18,3 +18,5 @@ pytest
 python-multipart
 bcrypt
 requests
+langchain-groq
+passlib
